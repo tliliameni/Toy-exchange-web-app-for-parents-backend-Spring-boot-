@@ -27,30 +27,53 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entities.Article;
+import com.example.demo.entities.Category;
 import com.example.demo.entities.News;
+import com.example.demo.entities.User;
 import com.example.demo.repository.ArticleRepository;
+import com.example.demo.repository.CategoryRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.restcontrollers.NewsController.CreateArticleResponse;
 import com.example.demo.restcontrollers.NewsController.UpdateArticleResponse;
 import com.example.demo.service.ArticleService;
 import com.example.demo.service.ArticleServiceImp;
+import com.example.demo.service.DashboardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.validation.Valid;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("Articles")
 public class ArticleController {
 	@Autowired
 	ArticleServiceImp se;
 	@Autowired
+	UserRepository userRepository;
+	@Autowired
+	private DashboardService dashboardService;
+	@Autowired
 	private ArticleRepository ArticleRepository;
-
+    @Autowired
+    private CategoryRepository categoryRepository;
 	@GetMapping("/all")
 	public List<Article> getAllArticles() {
+	    List<Article> articles = se.getAllArticles();
+	    for (Article article : articles) {
+	        User user = userRepository.findById(article.getUser().getId()).orElse(null);
+	        article.setUser(user);
+	    }
+	    return articles;
+	}
+	@GetMapping("/articles-count")
+	public ResponseEntity<Long> getArticlesCount() {
+		Long count = dashboardService.getArticlesCount();
+		return ResponseEntity.ok(count);
+	}
 
-		return se.getAllArticles();
-
+	@GetMapping("/search")
+	public List<Article> searchByCategoryName( @RequestParam(value="categoryName")String categoryName) {
+	    return se.searchByTitleAndCategoryName(categoryName);
 	}
 
 	public class CreateArticleResponse {
@@ -89,36 +112,53 @@ public class ArticleController {
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<CreateArticleResponse> createItem(@RequestParam("image") MultipartFile file,
-			@RequestParam("title") String title, @RequestParam("description") String description,
-			@RequestParam("exchange") String exchange, @RequestParam("price") String price) {
-		try {
-// Save the image file to the server's file system
-			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-			Path uploadPath = Paths.get("uploads");
-			if (!Files.exists(uploadPath)) {
-				Files.createDirectories(uploadPath);
-			}
-			try (InputStream inputStream = file.getInputStream()) {
-				Path filePath = uploadPath.resolve(fileName);
-				Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-			}
+	public ResponseEntity<CreateArticleResponse> createItem(
+	        @RequestParam("image") MultipartFile image,
+	        @RequestParam("title") String title,
+	        @RequestParam("description") String description,
+	        @RequestParam("exchange") String exchange,
+	        @RequestParam("price") String price,
+	        @RequestParam("categoryId") Integer categoryId,
+	        @RequestParam("userId") Long userId) {
 
-// Create a new Item entity and save it to the database
-			Article a = new Article(title, description,exchange,price,fileName);
-			se.ajouterArticle(a, file);
-			ArticleRepository.save(a);
-			CreateArticleResponse response = new CreateArticleResponse();
-			response.setMessage("Article created successfully!");
-			return ResponseEntity.status(HttpStatus.OK).body(response);
-		} catch (Exception e) {
-			e.printStackTrace();
-			CreateArticleResponse errorResponse = new CreateArticleResponse();
-			errorResponse.setMessage("Failed to create article.");
-// set any other properties as needed
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-		}
+		   try {
+		        // Save the image file to the server's file system
+		        String fileName = StringUtils.cleanPath(image.getOriginalFilename());
+		        Path uploadPath = Paths.get("uploads");
+		        if (!Files.exists(uploadPath)) {
+		            Files.createDirectories(uploadPath);
+		        }
+		        try (InputStream inputStream = image.getInputStream()) {
+		            Path filePath = uploadPath.resolve(fileName);
+		            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+		        }
+	        // Get the Category instance from the database
+	        Category category = categoryRepository.getById(categoryId);
+
+	        // Get the User instance from the database
+	        User user = userRepository.getById(userId);
+
+	        // Create a new Article entity and save it to the database
+	        Article article = new Article(title, description, exchange, price, fileName);
+	     
+	        article.setCategory(category);
+	        article.setUser(user);
+	        se.ajouterArticle(article, image);
+	        ArticleRepository.save(article);
+
+	        CreateArticleResponse response = new CreateArticleResponse();
+	        response.setMessage("Article created successfully!");
+	        return ResponseEntity.status(HttpStatus.OK).body(response);
+	    }catch (Exception e) {
+	        e.printStackTrace();
+	        CreateArticleResponse errorResponse = new CreateArticleResponse();
+	        errorResponse.setMessage("Failed to create article.");
+	        // set any other properties as needed
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+	    }
 	}
+	
+
 
 	@DeleteMapping("/delete/{id}")
 	public void deleteNews(@PathVariable int id) throws IOException {

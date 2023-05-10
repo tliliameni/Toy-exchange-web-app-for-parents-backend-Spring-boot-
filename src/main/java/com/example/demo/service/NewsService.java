@@ -12,7 +12,7 @@ public interface NewsService {
 	public News getNewsById(int Id);
 	public List<News> getNewsBMC(String motcle);
 	public void supprimerNews(int Id)throws IOException;
-	public void mettreAJourNews(News e);
+	public News mettreAJourNews(int id,MultipartFile photo ,String title, String description)throws IOException;
 	String saveImage(MultipartFile mf)throws IOException ;
 	byte[]  getImage(int id)throws IOException;
 	

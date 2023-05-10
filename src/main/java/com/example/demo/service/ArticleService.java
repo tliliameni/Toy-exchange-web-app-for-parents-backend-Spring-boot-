@@ -12,6 +12,7 @@ public interface ArticleService {
 	public void ajouterArticle(Article e,MultipartFile mf) throws IOException ;
 	public List<Article> getAllArticles();
 	public Article getArticleById(int Id);
+	public List<Article> searchByTitleAndCategoryName( String categoryName);
 	public List<Article> getArticleBMC(String motcle);
 	public void supprimerArticle(int Id)throws IOException;
 	public void mettreAJourArticle(Article e);

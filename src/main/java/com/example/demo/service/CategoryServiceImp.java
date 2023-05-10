@@ -28,9 +28,9 @@ public class CategoryServiceImp implements CategoryService {
 	}
 
 	@Override
-	public Category getCategoryById(int Id) {
+	public Category getCategoryById(int id) {
 
-		return gp.findById(Id).get();
+		return gp.findById(id).get();
 	}
 
 	@Override

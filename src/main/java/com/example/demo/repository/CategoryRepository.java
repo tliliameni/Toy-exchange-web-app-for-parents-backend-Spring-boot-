@@ -14,5 +14,10 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 	
 	@Query("select a from Category a  where a.nom like %:x%")
 	List<Category> rechercherParMc(@Param("x") String mc);
+	
+	@Query("SELECT c FROM Category c WHERE c.nom = :nom")
+	Category findByNom(@Param("nom") String nom);
+	
+	
 
 }

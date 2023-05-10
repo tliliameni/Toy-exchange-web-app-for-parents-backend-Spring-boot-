@@ -34,7 +34,7 @@ import com.example.demo.restcontrollers.NewsController.UpdateArticleResponse;
 import com.example.demo.service.CategoryServiceImp;
 import com.example.demo.service.NewsServiceImp;
 
-@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("Categories")
 public class CategoryController {
@@ -61,7 +61,6 @@ public class CategoryController {
 		return s.getCategoryById(id);
 	}
 
-
 	public class CreateArticleResponse {
 		private String message;
 
@@ -87,15 +86,14 @@ public class CategoryController {
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<CreateArticleResponse> createItem(
-			@RequestParam("nom") String nom) {
+	public ResponseEntity<CreateArticleResponse> createItem(@RequestParam("nom") String nom) {
 		try {
-		Category a = new Category(nom);
+			Category a = new Category(nom);
 			n.save(a);
 			CreateArticleResponse response = new CreateArticleResponse();
 			response.setMessage("Category created successfully!");
-			return ResponseEntity.status(HttpStatus.OK).body(response);}
-		 catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+		} catch (Exception e) {
 			e.printStackTrace();
 			CreateArticleResponse errorResponse = new CreateArticleResponse();
 			errorResponse.setMessage("Failed to create article.");
@@ -104,15 +102,21 @@ public class CategoryController {
 		}
 	}
 
+	@GetMapping("/getbyName/{nom}")
+	public Category getByName(@PathVariable("nom") String nom) {
+		return n.findByNom(nom);
+	}
+
 	@DeleteMapping("/delete/{id}")
 	public void deleteCategory(@PathVariable int id) throws IOException {
-		//s.supprimerCategoryy(id);
-		n.deleteById(id);
+		// s.supprimerCategoryy(id);
+		Category c = n.getById(id);
+		n.delete(c);
 	}
 
 	@PutMapping("/update/{id}")
 	public ResponseEntity<UpdateArticleResponse> updateCategory(@PathVariable int id,
-			
+
 			@RequestParam("nom") String nom) {
 		try {
 			// Get the article by id
@@ -126,7 +130,6 @@ public class CategoryController {
 
 			// Update the fields of the article
 			Category.setNom(nom);
-			
 
 			n.save(Category);
 

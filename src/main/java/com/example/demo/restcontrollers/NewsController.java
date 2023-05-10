@@ -29,13 +29,14 @@ import com.example.demo.entities.News;
 import com.example.demo.repository.ArticleRepository;
 import com.example.demo.repository.NewsRepository;
 import com.example.demo.service.ArticleServiceImp;
+import com.example.demo.service.DashboardService;
 import com.example.demo.service.NewsServiceImp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.validation.Valid;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("News")
 
@@ -44,13 +45,19 @@ public class NewsController {
      NewsRepository n;
 	@Autowired
     NewsServiceImp s;
+	@Autowired
+	DashboardService dashboardService;
 	@GetMapping("/all")
 	public List<News> getAllNews() {
 		
 		return s.getAllNews();
 		
 	}
-	
+	@GetMapping("/news-count")
+	public ResponseEntity<Long> getNewsCount() {
+		Long count = dashboardService.getArticlesCount();
+		return ResponseEntity.ok(count);
+	}
 	@GetMapping("/rechercheParMc/{mc}")
 	public List<News> getAllNewsByMc(@PathVariable("mc") String mot) {
 	
@@ -131,9 +138,9 @@ public class NewsController {
 		
 		@PutMapping("/update/{id}")
 		public ResponseEntity<UpdateArticleResponse> updateNews(@PathVariable int id,
-		                                                         @RequestParam(value="file") MultipartFile file,
-		                                                         @RequestParam("title") String title,
-		                                                         @RequestParam("description") String description) {
+		        @RequestParam(value = "file", required=false) MultipartFile file,
+		        @RequestParam("title") String title,
+		        @RequestParam("description") String description) {
 		    try {
 		        // Get the article by id
 		        Optional<News> optionalNews = n.findById(id);
@@ -149,19 +156,24 @@ public class NewsController {
 		        news.setDescritption(description);
 
 		        // Save the updated image file to the server's file system
-		        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-		        Path uploadPath = Paths.get("uploads");
-		        if (!Files.exists(uploadPath)) {
-		            Files.createDirectories(uploadPath);
+		        String fileName = news.getPhoto();
+		        if (file != null) {
+		            fileName = StringUtils.cleanPath(file.getOriginalFilename());
+		            Path uploadPath = Paths.get("uploads");
+		            if (!Files.exists(uploadPath)) {
+		                Files.createDirectories(uploadPath);
+		            }
+		            try (InputStream inputStream = file.getInputStream()) {
+		                Path filePath = uploadPath.resolve(fileName);
+		                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+		            }
+		            news.setPhoto(fileName);
+		            s.saveImage(file);
 		        }
-		        try (InputStream inputStream = file.getInputStream()) {
-		            Path filePath = uploadPath.resolve(fileName);
-		            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-		        }
-		        news.setPhoto(fileName);
+		      
 
 		        // Save the updated article to the database
-		        s.ajouterNews(news, file);
+
 		        n.save(news);
 
 		        UpdateArticleResponse response = new UpdateArticleResponse();

@@ -15,7 +15,8 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
 		
 		@Query("select a from Article a  where a.title like %:x%")
 		List<Article> rechercherParMc(@Param("x") String mc);
+		 @Query("select a from Article a join a.category c where c.nom = :categoryName")
+		    List<Article> searchByTitleAndCategoryName( @Param("categoryName") String categoryName);
 
-		
 
 	}
