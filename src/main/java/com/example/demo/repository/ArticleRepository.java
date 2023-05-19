@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.entities.Article;
+import com.example.demo.entities.User;
 
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Integer> {
@@ -18,5 +19,5 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
 		 @Query("select a from Article a join a.category c where c.nom = :categoryName")
 		    List<Article> searchByTitleAndCategoryName( @Param("categoryName") String categoryName);
 
-
+		 List<Article> findByUser(User user);
 	}

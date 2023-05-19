@@ -84,14 +84,17 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 //    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 //  }
   
-  @Bean
+  @Bean    
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.cors().and().csrf().disable()
         .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .authorizeRequests().requestMatchers("/api/auth/**").permitAll()
+        .authorizeRequests().requestMatchers("/api/auth/**").permitAll() 
         .requestMatchers("/api/test/**").permitAll().requestMatchers("/Articles/**").permitAll().requestMatchers("/News/**").permitAll().requestMatchers("/Categories/**").permitAll()
-        .requestMatchers("/dashboard/**").permitAll()
+        .requestMatchers("/dashboard/**").permitAll().requestMatchers("/AboutUs/**").permitAll().requestMatchers("/ContactPage/**").permitAll()
+        .requestMatchers("/NewsPage/**").permitAll() .requestMatchers("/ArticlePage/**").permitAll() 
+        .requestMatchers("/MentionLegal/**").permitAll().requestMatchers("/sendMail/**").permitAll()
+        .requestMatchers("/Profile/**").permitAll()
         .anyRequest().authenticated();
     
     http.authenticationProvider(authenticationProvider());

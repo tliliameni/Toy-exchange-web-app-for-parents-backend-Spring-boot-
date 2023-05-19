@@ -3,9 +3,12 @@ package com.example.demo.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.entities.PageNews;
-
+import com.example.demo.entities.PageContact;
 @Repository
-public interface BanderoleNewsRepository extends JpaRepository<PageNews, Integer>{
+public interface PageContactRepository extends JpaRepository<PageContact, Integer> {
+	
+	
+
 
 }
+

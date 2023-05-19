@@ -49,6 +49,8 @@ public class ArticleController {
 	@Autowired
 	ArticleServiceImp se;
 	@Autowired
+	UserRepository us;
+	@Autowired
 	UserRepository userRepository;
 	@Autowired
 	private DashboardService dashboardService;
@@ -87,6 +89,10 @@ public class ArticleController {
 			this.message = message;
 		}
 	}
+	@GetMapping("getById/{id}")
+	public Article getNews(@PathVariable("id") int id) {
+		return se.getArticleById(id);
+	}
 
 	public class UpdateArticleResponse {
 		private String message;
@@ -105,7 +111,11 @@ public class ArticleController {
 
 		return se.getArticleBMC(mot);
 	}
-
+	 @GetMapping("/users/{userId}/articles")
+	    public List<Article> getUserArticles(@PathVariable Long userId) {
+	       User user= us.getById(userId);
+	        return ArticleRepository.findByUser(user);
+	    }
 	@GetMapping(path = "/getImage/{id}", produces = MediaType.ALL_VALUE)
 	public byte[] getImage(@PathVariable("id") int id) throws IOException {
 		return se.getImage(id);

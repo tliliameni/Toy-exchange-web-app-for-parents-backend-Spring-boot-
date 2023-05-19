@@ -2,11 +2,9 @@ package com.example.demo.entities;
 
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
-import jakarta.persistence.CascadeType;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -48,8 +46,27 @@ public class User {
   @NotBlank
   @Size(max = 120)
   private String password;
+  @Nullable
+  @Column(nullable = true)
+  private String photo;
+  @NotBlank
+  @Column(nullable = true)
+  private String phoneNumber;
+ 
+  public String getPhoto() {
+	return photo;
+}
+public void setPhoto(String photo) {
+	this.photo = photo;
+}
+public String getPhoneNumber() {
+	return phoneNumber;
+}
+public void setPhoneNumber(String phoneNumber) {
+	this.phoneNumber = phoneNumber;
+}
 
-  @ManyToMany(fetch = FetchType.LAZY)
+@ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "user_roles", 
              joinColumns = @JoinColumn(name = "user_id"),
              inverseJoinColumns = @JoinColumn(name = "role_id"))

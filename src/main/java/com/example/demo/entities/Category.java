@@ -35,27 +35,38 @@ public class Category {
 	public void setId(int id) {
 		this.id = id;
 	}
-
+	@Column(nullable = false)
+	private String photo;
 	@Column(nullable = false)
 	private String nom;
 
-	public Category(int id, String nom) {
+	public Category(int id, String nom,String photo) {
 		super();
 		this.id = id;
 		this.nom = nom;
+		this.photo=photo;
 	}
 
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
 	@JsonProperty(access = Access.WRITE_ONLY) // prend en charge la liste en mode d'ecriture
 	List<Article> liste;
 
-	public Category(String nom2) {
+	public Category(String nom2,String photo) {
 		nom = nom2;
+		this.photo=photo;
 	}
 
 	public Category() {
 		super();
 	}
+
+	public String getPhoto() {
+		return photo;
+	}
+	public void setPhoto(String photo) {
+		this.photo= photo;
+	}
+	
 
 	public String getNom() {
 		return nom;

@@ -4,86 +4,52 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.example.demo.entities.Article;
-import com.example.demo.entities.Category;
-import com.example.demo.entities.News;
-import com.example.demo.repository.CategoryRepository;
-
+import com.example.demo.entities.User;
+import com.example.demo.repository.UserRepository;
 @Service
-public class CategoryServiceImp implements CategoryService {
-	@Autowired //injection de dependance consite à eviter la dependance entre deux classes
-	CategoryRepository gp;
+public class ProfileServiceImp implements ProfileService {
+	@Autowired 
+	UserRepository us;
+	
+	public void addImage(User user,MultipartFile mf) throws IOException{
+	String photo;
 
-	@Override
-	public void ajouterCategory(Category g, MultipartFile mf) throws IOException {
-		String photo;
-		if (!mf.getOriginalFilename().equals("")) {
-			photo = saveImage(mf);
+	if (!mf.getOriginalFilename().equals("")) {
+		photo = saveImage(mf);
 
-		}
-		gp.save(g);
 	}
-
-	@Override
-	public List<Category> getAllCategories() {
-
-		return gp.findAll();
-	}
-
-	@Override
-	public Category getCategoryById(int id) {
-
-		return gp.findById(id).get();
-	}
-
-	@Override
-	public List<Category> getCategoryBMC(String motcle) {
-
-		return gp.rechercherParMc(motcle);
-	}
-
-	@Override
-	public void supprimerCategory(int Id) {
-		
-		gp.deleteById(Id);
-		
-	}
-	public void supprimerCategoryy(int Id)throws IOException {
-
-		Category category = gp.getById(Id);
-		gp.delete(category);
-	}	
-	@Override
-	public Category mettreAJourCategory(int id, MultipartFile photo, String nom) throws IOException {
-		// Retrieve the existing publication by its ID
-		Optional<Category> existingPublication=gp.findById(id);
-		if (!existingPublication.isPresent()) {
+	us.save(user);
+}
+	
+	public User updateUser(long id,MultipartFile photo ,String username,String email, String phone)throws IOException{
+		Optional<User> existingUser=us.findById(id);
+		if (!existingUser.isPresent()) {
 			// If the publication does not exist, return null
-			System.out.println("Publication not found");
+			System.out.println("User not found");
 			return null;
 		}
-		Category updatedPublication = existingPublication.get();
+		User updatedUser = existingUser.get();
 		
 		// Update the publication fields
-		updatedPublication.setNom(updatedPublication.getNom());;
-		
+		updatedUser.setUsername(updatedUser.getUsername());;
+	
+		updatedUser.setEmail(updatedUser.getEmail());
 
 		// Update the photos
 		if (photo != null) {
 		saveImage(photo);
 		}
+		if(phone != null) {
+			updatedUser.setPhoneNumber(updatedUser.getPhoneNumber());
+		}
 		// Save the updated publication to the database
-		return gp.save(updatedPublication);
+		return us.save(updatedUser);
 	}
-
-
+	
 	@Override
 	public String saveImage(MultipartFile mf) throws IOException {
 		String nameFile = mf.getOriginalFilename(); // Get the original filename
@@ -101,12 +67,12 @@ public class CategoryServiceImp implements CategoryService {
 	}
 
 	@Override
-	public byte[] getImage(int id) throws IOException {
+	public byte[] getImage(long id) throws IOException {
 		// TODO Auto-generated method stub
-		Category cat = gp.getById(id);
+		User user = us.getById(id);
 		// String chemin = System.getProperty("user.home") + "/images2022/";
 		String chemin = System.getProperty("user.dir") + "/src/main/webapp/imagesdata/";
-		Path p = Paths.get(chemin, cat.getPhoto());
+		Path p = Paths.get(chemin, user.getPhoto());
 		return Files.readAllBytes(p);
 	}
 

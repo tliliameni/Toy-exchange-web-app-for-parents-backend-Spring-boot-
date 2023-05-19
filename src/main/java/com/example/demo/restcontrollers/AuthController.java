@@ -2,7 +2,9 @@ package com.example.demo.restcontrollers;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.util.Properties;
+import java.util.UUID;
 
 import com.example.demo.entities.ERole;
 import com.example.demo.entities.Role;
@@ -53,6 +60,9 @@ public class AuthController {
 
 	@Autowired
 	JwtUtils jwtUtils;
+	
+
+
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {

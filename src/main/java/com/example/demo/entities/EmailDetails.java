@@ -16,7 +16,13 @@ public class EmailDetails {
 
  // Class data members
  private String recipient;
- private String msgBody;
+ public EmailDetails(String recipient, String msgBody, String subject) {
+	super();
+	this.recipient = recipient;
+	this.msgBody = msgBody;
+	this.subject = subject;
+}
+private String msgBody;
  private String subject;
  private String attachment;
 public String getRecipient() {

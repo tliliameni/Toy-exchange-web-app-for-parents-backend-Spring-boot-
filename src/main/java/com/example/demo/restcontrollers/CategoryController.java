@@ -72,7 +72,10 @@ public class CategoryController {
 			this.message = message;
 		}
 	}
-
+	@GetMapping(path="/getImage/{id}", produces = { MediaType.IMAGE_JPEG_VALUE, MediaType.ALL_VALUE, MediaType.IMAGE_PNG_VALUE })
+	public byte[] getImage(@PathVariable("id") int id) throws IOException {
+	    return s.getImage(id);
+	}
 	public class UpdateArticleResponse {
 		private String message;
 
@@ -86,22 +89,34 @@ public class CategoryController {
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<CreateArticleResponse> createItem(@RequestParam("nom") String nom) {
-		try {
-			Category a = new Category(nom);
-			n.save(a);
-			CreateArticleResponse response = new CreateArticleResponse();
-			response.setMessage("Category created successfully!");
-			return ResponseEntity.status(HttpStatus.OK).body(response);
-		} catch (Exception e) {
-			e.printStackTrace();
-			CreateArticleResponse errorResponse = new CreateArticleResponse();
-			errorResponse.setMessage("Failed to create article.");
-			// set any other properties as needed
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-		}
-	}
-
+	public ResponseEntity<CreateArticleResponse> createItem(@RequestParam("image") MultipartFile file,@RequestParam("nom") String nom) {
+		  try {
+		      // Save the image file to the server's file system
+		      String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+		      Path uploadPath = Paths.get("uploads");
+		      if (!Files.exists(uploadPath)) {
+		        Files.createDirectories(uploadPath);
+		      }
+		      try (InputStream inputStream = file.getInputStream()) {
+		        Path filePath = uploadPath.resolve(fileName);
+		        Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+		      }
+		      
+		      // Create a new Item entity and save it to the database
+		   Category a=new Category(nom,fileName);
+		   s.ajouterCategory(a, file);
+		   n.save(a);
+		   CreateArticleResponse response = new CreateArticleResponse();
+		    response.setMessage("Category created successfully!");
+		    return ResponseEntity.status(HttpStatus.OK).body(response);
+		    } catch (Exception e) {
+		      e.printStackTrace();
+		      CreateArticleResponse errorResponse = new CreateArticleResponse();
+		      errorResponse.setMessage("Failed to create category.");
+		      // set any other properties as needed
+		      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		  }
+		  }
 	@GetMapping("/getbyName/{nom}")
 	public Category getByName(@PathVariable("nom") String nom) {
 		return n.findByNom(nom);
@@ -115,34 +130,57 @@ public class CategoryController {
 	}
 
 	@PutMapping("/update/{id}")
-	public ResponseEntity<UpdateArticleResponse> updateCategory(@PathVariable int id,
+	public ResponseEntity<UpdateArticleResponse> updateCategory(@PathVariable int id, @RequestParam(value = "file", required=false) MultipartFile file,
 
 			@RequestParam("nom") String nom) {
-		try {
-			// Get the article by id
-			Optional<Category> optionalNews = n.findById(id);
-			if (optionalNews.isEmpty()) {
-				// Return 404 Not Found if the article is not found
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-			}
+		  try {
+		        // Get the article by id
+		        Optional<Category> optionalNews = n.findById(id);
+		        if (optionalNews.isEmpty()) {
+		            // Return 404 Not Found if the article is not found
+		            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		        }
 
-			Category Category = optionalNews.get();
+		        Category Category = optionalNews.get();
 
-			// Update the fields of the article
-			Category.setNom(nom);
+		        // Update the fields of the article
+		        Category.setNom(nom);
+		      
 
-			n.save(Category);
+		        // Save the updated image file to the server's file system
+		        String fileName = Category.getPhoto();
+		        if (file != null) {
+		            fileName = StringUtils.cleanPath(file.getOriginalFilename());
+		            Path uploadPath = Paths.get("uploads");
+		            if (!Files.exists(uploadPath)) {
+		                Files.createDirectories(uploadPath);
+		            }
+		            try (InputStream inputStream = file.getInputStream()) {
+		                Path filePath = uploadPath.resolve(fileName);
+		                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+		            }
+		            Category.setPhoto(fileName);
+		            s.saveImage(file);
+		        }
+		      
 
-			UpdateArticleResponse response = new UpdateArticleResponse();
-			response.setMessage("Category updated successfully!");
-			return ResponseEntity.status(HttpStatus.OK).body(response);
-		} catch (Exception e) {
-			e.printStackTrace();
-			UpdateArticleResponse errorResponse = new UpdateArticleResponse();
-			errorResponse.setMessage("Failed to update Category.");
-			// set any other properties as needed
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		        // Save the updated article to the database
+
+		        n.save(Category);
+
+		        UpdateArticleResponse response = new UpdateArticleResponse();
+		        response.setMessage("News updated successfully!");
+		        return ResponseEntity.status(HttpStatus.OK).body(response);
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        UpdateArticleResponse errorResponse = new UpdateArticleResponse();
+		        errorResponse.setMessage("Failed to update article.");
+		        // set any other properties as needed
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		    }
 		}
-	}
+
 
 }
+
+

@@ -20,6 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   Boolean existsByEmail(String email);
   int countByCreatedAtBetween(LocalDate date, LocalDate localDate);
+User findByEmail(String email);
+
 
   List<NewUserCount> countByCreatedAtBetween(LocalDate fromDate, LocalDate toDate, Pageable pageable);
 

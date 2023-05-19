@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class BanderoleArticle {
+public class PageNews {
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +16,7 @@ public class BanderoleArticle {
 	private String photo;
 	private String title;
 	private String description;
-	public BanderoleArticle(int id, String photo,String title,String description) {
+	public PageNews(int id, String photo,String title,String description) {
 		super();
 		this.id = id;
 		this.photo = photo;
@@ -35,8 +35,15 @@ public class BanderoleArticle {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public BanderoleArticle() {
+	public PageNews() {
 		super();
+	}
+	public PageNews(String title2, String description2, String fileName) {
+		super();
+	
+		this.photo = fileName;
+		this.title=title2;
+		this.description=description2;
 	}
 	public int getId() {
 		return id;
@@ -50,5 +57,4 @@ public class BanderoleArticle {
 	public void setPhoto(String photo) {
 		this.photo = photo;
 	}
-	
 }

@@ -4,85 +4,75 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.demo.entities.Article;
-import com.example.demo.entities.Category;
-import com.example.demo.entities.News;
-import com.example.demo.repository.CategoryRepository;
+import com.example.demo.entities.PageNews;
+import com.example.demo.repository.PageNewsRepository;
 
 @Service
-public class CategoryServiceImp implements CategoryService {
-	@Autowired //injection de dependance consite à eviter la dependance entre deux classes
-	CategoryRepository gp;
+public class PageNewsServiceImp implements PageNewsService {
+	@Autowired
+	PageNewsRepository et;
 
 	@Override
-	public void ajouterCategory(Category g, MultipartFile mf) throws IOException {
+	public void ajouterPageNews(PageNews e, MultipartFile mf) throws IOException {
+
 		String photo;
+
 		if (!mf.getOriginalFilename().equals("")) {
 			photo = saveImage(mf);
 
 		}
-		gp.save(g);
+		et.save(e);
+	}
+
+
+	@Override
+	public PageNews getPageNewsById(int Id) {
+
+		return et.findById(Id).get();
 	}
 
 	@Override
-	public List<Category> getAllCategories() {
+	public void supprimerPageNews(int Id) throws IOException {
 
-		return gp.findAll();
+		PageNews PageNews = et.getById(Id);
+		// String chemin = System.getProperty("user.home") + "/images2022/";
+		String chemin = System.getProperty("user.dir") + "/src/main/webapp/imagesdata/";
+		// Path p = Paths.get(chemin,article.getPhoto());
+		// Files.delete(p);
+		et.delete(PageNews);
 	}
 
 	@Override
-	public Category getCategoryById(int id) {
-
-		return gp.findById(id).get();
-	}
-
-	@Override
-	public List<Category> getCategoryBMC(String motcle) {
-
-		return gp.rechercherParMc(motcle);
-	}
-
-	@Override
-	public void supprimerCategory(int Id) {
-		
-		gp.deleteById(Id);
-		
-	}
-	public void supprimerCategoryy(int Id)throws IOException {
-
-		Category category = gp.getById(Id);
-		gp.delete(category);
-	}	
-	@Override
-	public Category mettreAJourCategory(int id, MultipartFile photo, String nom) throws IOException {
+	public PageNews mettreAJourPageNews(int id, MultipartFile photo, String title, String description) throws IOException {
 		// Retrieve the existing publication by its ID
-		Optional<Category> existingPublication=gp.findById(id);
+		Optional<PageNews> existingPublication=et.findById(id);
 		if (!existingPublication.isPresent()) {
 			// If the publication does not exist, return null
 			System.out.println("Publication not found");
 			return null;
 		}
-		Category updatedPublication = existingPublication.get();
+		PageNews updatedPublication = existingPublication.get();
 		
 		// Update the publication fields
-		updatedPublication.setNom(updatedPublication.getNom());;
-		
+		updatedPublication.setTitle(updatedPublication.getTitle());;
+		updatedPublication.setDescription(updatedPublication.getDescription());
+	
 
 		// Update the photos
 		if (photo != null) {
 		saveImage(photo);
 		}
 		// Save the updated publication to the database
-		return gp.save(updatedPublication);
+		return et.save(updatedPublication);
 	}
 
+	/************** image ****/
 
 	@Override
 	public String saveImage(MultipartFile mf) throws IOException {
@@ -103,10 +93,10 @@ public class CategoryServiceImp implements CategoryService {
 	@Override
 	public byte[] getImage(int id) throws IOException {
 		// TODO Auto-generated method stub
-		Category cat = gp.getById(id);
+		PageNews PageNews = et.getById(id);
 		// String chemin = System.getProperty("user.home") + "/images2022/";
 		String chemin = System.getProperty("user.dir") + "/src/main/webapp/imagesdata/";
-		Path p = Paths.get(chemin, cat.getPhoto());
+		Path p = Paths.get(chemin, PageNews.getPhoto());
 		return Files.readAllBytes(p);
 	}
 
