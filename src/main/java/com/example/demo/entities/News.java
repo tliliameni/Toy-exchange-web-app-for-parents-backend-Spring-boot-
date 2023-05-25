@@ -1,10 +1,13 @@
 package com.example.demo.entities;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 @Entity @Table
 public class News {
@@ -16,6 +19,8 @@ public class News {
 	private String title;
 	@Column(name = "photo")
 	private String photo;
+	  @Column(name = "created_at")
+	  private LocalDate createdAt;
 	public News(String title2, String description2, String fileName) {
 		super();
 		title=title2;
@@ -28,6 +33,13 @@ public class News {
 		title=title2;
 		description=description2;
 		photo=fileName;
+	}
+	 @PrePersist
+	  protected void onCreate() {
+	      createdAt = LocalDate.now();
+	  }
+	public LocalDate getCreatedAt() {
+		return createdAt;
 	}
 	
 	public News() {
