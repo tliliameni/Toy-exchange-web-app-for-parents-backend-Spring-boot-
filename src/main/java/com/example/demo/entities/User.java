@@ -49,7 +49,7 @@ public class User {
   @Nullable
   @Column(nullable = true)
   private String photo;
-  @NotBlank
+  @Nullable
   @Column(nullable = true)
   private String phoneNumber;
  
