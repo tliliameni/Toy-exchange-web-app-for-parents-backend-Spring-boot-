@@ -34,6 +34,14 @@ public class HomePage {
 		this.description = description;
 		this.subtitle = subtitle;
 	}
+	public HomePage(int id,String title, String subtitle,String description,String photo) {
+		super();
+		this.id=id;
+		this.photo = photo;
+		this.title = title;
+		this.description = description;
+		this.subtitle = subtitle;
+	}
 	public String getTitle() {
 		return title;
 	}

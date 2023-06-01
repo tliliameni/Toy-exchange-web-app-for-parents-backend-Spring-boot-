@@ -12,7 +12,7 @@ public interface HomePageService {
 	public HomePage getHomePageById(int Id);
 	public List<HomePage> getAll();
 	public void supprimerHomePage(int Id)throws IOException;
-	public HomePage mettreAJourHomePage(int id,MultipartFile photo ,String title, String description)throws IOException;
+	public HomePage mettreAJourHomePage(int id,MultipartFile photo ,String title,String subtitle,String description)throws IOException;
 	String saveImage(MultipartFile mf)throws IOException ;
 	byte[]  getImage(int id)throws IOException;
 

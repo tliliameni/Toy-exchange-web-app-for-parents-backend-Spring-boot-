@@ -55,7 +55,7 @@ public class HomePaageServiceImp implements HomePageService{
 	}
 
 	@Override
-	public HomePage mettreAJourHomePage(int id, MultipartFile photo, String title, String description) throws IOException {
+	public HomePage mettreAJourHomePage(int id, MultipartFile photo, String title, String subtitle, String description) throws IOException {
 		// Retrieve the existing publication by its ID
 		Optional<HomePage> existingPublication=et.findById(id);
 		if (!existingPublication.isPresent()) {

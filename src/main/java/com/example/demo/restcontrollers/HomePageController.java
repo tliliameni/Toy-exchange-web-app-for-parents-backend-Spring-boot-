@@ -121,7 +121,7 @@ public class HomePageController {
 		
 		@PutMapping("/update/{id}")
 		public ResponseEntity<UpdateArticleResponse> updateHomePage(@PathVariable int id,
-		        @RequestParam(value = "file", required=false) MultipartFile file,
+		        @RequestParam(value = "photo", required=false) MultipartFile file,
 		        @RequestParam("title") String title,
 		        @RequestParam("subtitle") String subtitle,
 		        @RequestParam("description") String description) {

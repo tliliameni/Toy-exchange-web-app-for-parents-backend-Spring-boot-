@@ -179,7 +179,7 @@ public class ArticleController {
 	public ResponseEntity<UpdateArticleResponse> updateNews(@PathVariable int id,
 			@RequestParam(value="file",required=false) MultipartFile file, @RequestParam("title") String title,
 			@RequestParam("description") String description, @RequestParam("exchange") String exchange,
-			@RequestParam("price") String price) {
+			@RequestParam("price") String price, @RequestParam("categoryId") Integer categoryId) {
 		try {
 // Get the article by id
 			Optional<Article> optionalArticle = ArticleRepository.findById(id);
@@ -189,27 +189,29 @@ public class ArticleController {
 			}
 
 			Article a = optionalArticle.get();
-
+			Category cat=categoryRepository.getById(categoryId);
 // Update the fields of the article
 			a.settitle(title);
 			a.setDescritption(description);
 			a.setExchange(exchange);
 			a.setPrice(price);
-
+            a.setCategory(cat);
 // Save the updated image file to the server's file system
-			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-			Path uploadPath = Paths.get("uploads");
-			if (!Files.exists(uploadPath)) {
-				Files.createDirectories(uploadPath);
-			}
-			try (InputStream inputStream = file.getInputStream()) {
-				Path filePath = uploadPath.resolve(fileName);
-				Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-			}
-			a.setPhoto(fileName);
-
-// Save the updated article to the database
-			se.ajouterArticle(a, file);
+            String fileName = a.getPhoto();
+	        if (file != null) {
+	            fileName = StringUtils.cleanPath(file.getOriginalFilename());
+	            Path uploadPath = Paths.get("uploads");
+	            if (!Files.exists(uploadPath)) {
+	                Files.createDirectories(uploadPath);
+	            }
+	            try (InputStream inputStream = file.getInputStream()) {
+	                Path filePath = uploadPath.resolve(fileName);
+	                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+	            }
+	            a.setPhoto(fileName);
+	            se.saveImage(file);
+	        }
+	      
 			ArticleRepository.save(a);
 
 			UpdateArticleResponse response = new UpdateArticleResponse();
