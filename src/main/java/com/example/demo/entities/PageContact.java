@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
 @Entity
 public class PageContact {
 	@Id
@@ -17,7 +16,11 @@ public class PageContact {
 	private String title;
 	private String description;
 	
-	
+ 
+
+
+
+
 	public PageContact(int id, String photo,String title,String description) {
 		super();
 		this.id = id;
@@ -26,6 +29,11 @@ public class PageContact {
 		this.description=description;
 	
 	}
+    
+   
+
+
+
 	public PageContact() {
 		super();
 	}

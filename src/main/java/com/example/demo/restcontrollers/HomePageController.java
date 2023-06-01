@@ -25,26 +25,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.demo.entities.News;
-import com.example.demo.entities.PageContact;
-
-import com.example.demo.repository.PageContactRepository;
-
-import com.example.demo.service.PageContactServiceImp;
+import com.example.demo.entities.Category;
+import com.example.demo.entities.HomePage;
+import com.example.demo.repository.PageHomeRepository;
+import com.example.demo.restcontrollers.HomePageController.CreateArticleResponse;
+import com.example.demo.restcontrollers.HomePageController.UpdateArticleResponse;
+import com.example.demo.service.HomePaageServiceImp;
 
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
-@RequestMapping("ContactPage")
-public class PageContactController {
+@RequestMapping("HomePage")
+public class HomePageController {
 	@Autowired
-    PageContactRepository n;
-	;
+	PageHomeRepository n;
 	@Autowired
-   PageContactServiceImp s;
-
+	HomePaageServiceImp s;
 	@GetMapping("getById/{id}")
-	public PageContact getPageContact(@PathVariable("id") int id) {
-		return s.getPageContactById(id);
+	public HomePage getHomePage(@PathVariable("id") int id) {
+		return s.getHomePageById(id);
+	}
+	@GetMapping("/all")
+	public List<HomePage> getAll() {
+
+		return s.getAll();
+
 	}
 	@GetMapping(path="/getImage/{id}", produces = { MediaType.IMAGE_JPEG_VALUE, MediaType.ALL_VALUE, MediaType.IMAGE_PNG_VALUE })
 	public byte[] getImage(@PathVariable("id") int id) throws IOException {
@@ -77,6 +81,7 @@ public class PageContactController {
 	  @PostMapping("/create")
 	  public ResponseEntity<CreateArticleResponse> createItem(@RequestParam("image") MultipartFile file,
 	                                           @RequestParam("title") String title,
+	                                           @RequestParam("subtitle") String subtitle,
 	                                           @RequestParam("description") String description
 	                                        ) {
 	    try {
@@ -92,16 +97,16 @@ public class PageContactController {
 	      }
 	      
 	      // Create a new Item entity and save it to the database
-	      PageContact a=new PageContact(title,description,fileName);
-	   s.ajouterPageContact(a, file);
+	      HomePage a=new HomePage(title,subtitle,description,fileName);
+	   s.ajouterHomePage(a, file);
 	   n.save(a);
 	   CreateArticleResponse response = new CreateArticleResponse();
-	    response.setMessage("PageContact created successfully!");
+	    response.setMessage("PageArticle created successfully!");
 	    return ResponseEntity.status(HttpStatus.OK).body(response);
 	    } catch (Exception e) {
 	      e.printStackTrace();
 	      CreateArticleResponse errorResponse = new CreateArticleResponse();
-	      errorResponse.setMessage("Failed to create PageContact.");
+	      errorResponse.setMessage("Failed to create PageArticle.");
 	      // set any other properties as needed
 	      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 	  }
@@ -110,31 +115,32 @@ public class PageContactController {
 		@DeleteMapping("/delete/{id}")
 		public void deleteNews(@PathVariable  int id) throws IOException 
 		{
-			s.supprimerPageContact(id);
+			s.supprimerHomePage(id);
 		}
 		
 		
 		@PutMapping("/update/{id}")
-		public ResponseEntity<UpdateArticleResponse> updatePageContact(@PathVariable int id,
+		public ResponseEntity<UpdateArticleResponse> updateHomePage(@PathVariable int id,
 		        @RequestParam(value = "file", required=false) MultipartFile file,
 		        @RequestParam("title") String title,
+		        @RequestParam("subtitle") String subtitle,
 		        @RequestParam("description") String description) {
 		    try {
 		        // Get the article by id
-		        Optional<PageContact> optionalPageContact = n.findById(id);
-		        if (optionalPageContact.isEmpty()) {
+		        Optional<HomePage> optionalHomePage = n.findById(id);
+		        if (optionalHomePage.isEmpty()) {
 		            // Return 404 Not Found if the article is not found
 		            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		        }
 
-		        PageContact PageContact = optionalPageContact.get();
+		        HomePage HomePage = optionalHomePage.get();
 
 		        // Update the fields of the article
-		        PageContact.settitle(title);
-		        PageContact.setDescription(description);
-
+		        HomePage.setTitle(title);
+		        HomePage.setDescription(description);
+		        HomePage.setSubtitle(subtitle);
 		        // Save the updated image file to the server's file system
-		        String fileName = PageContact.getPhoto();
+		        String fileName = HomePage.getPhoto();
 		        if (file != null) {
 		            fileName = StringUtils.cleanPath(file.getOriginalFilename());
 		            Path uploadPath = Paths.get("uploads");
@@ -145,28 +151,28 @@ public class PageContactController {
 		                Path filePath = uploadPath.resolve(fileName);
 		                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
 		            }
-		            PageContact.setPhoto(fileName);
+		            HomePage.setPhoto(fileName);
 		            s.saveImage(file);
 		        }
 		      
 
 		        // Save the updated article to the database
 
-		        n.save(PageContact);
+		        n.save(HomePage);
 
 		        UpdateArticleResponse response = new UpdateArticleResponse();
-		        response.setMessage("PageContact updated successfully!");
+		        response.setMessage("PageHome updated successfully!");
 		        return ResponseEntity.status(HttpStatus.OK).body(response);
 		    } catch (Exception e) {
 		        e.printStackTrace();
 		        UpdateArticleResponse errorResponse = new UpdateArticleResponse();
-		        errorResponse.setMessage("Failed to update PageContact.");
+		        errorResponse.setMessage("Failed to update HomePage.");
 		        // set any other properties as needed
 		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 		    }
 		}
 
-		
+
 }
 
 

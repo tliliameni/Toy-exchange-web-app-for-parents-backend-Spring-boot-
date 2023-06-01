@@ -94,7 +94,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .requestMatchers("/dashboard/**").permitAll().requestMatchers("/AboutUs/**").permitAll().requestMatchers("/ContactPage/**").permitAll()
         .requestMatchers("/NewsPage/**").permitAll() .requestMatchers("/ArticlePage/**").permitAll() 
         .requestMatchers("/MentionLegal/**").permitAll().requestMatchers("/sendMail/**").permitAll()
-        .requestMatchers("/Profile/**").permitAll()
+        .requestMatchers("/Profile/**").permitAll().requestMatchers("/HomePage/**").permitAll()
         .anyRequest().authenticated();
     
     http.authenticationProvider(authenticationProvider());
