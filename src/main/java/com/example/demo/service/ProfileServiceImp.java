@@ -1,10 +1,13 @@
 package com.example.demo.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,15 +68,37 @@ public class ProfileServiceImp implements ProfileService {
 																					// return the filename with the
 																					// original extension
 	}
-
 	@Override
 	public byte[] getImage(long id) throws IOException {
-		// TODO Auto-generated method stub
-		User user = us.getById(id);
-		// String chemin = System.getProperty("user.home") + "/images2022/";
-		String chemin = System.getProperty("user.dir") + "/src/main/webapp/imagesdata/";
-		Path p = Paths.get(chemin, user.getPhoto());
-		return Files.readAllBytes(p);
+	    User user = us.getById(id);
+	    if (user == null || user.getPhoto() == null || user.getPhoto().isEmpty()) {
+	        // Return a default or placeholder image
+	        return getDefaultImage();
+	    }
+	    
+	    String chemin = System.getProperty("user.dir") + "/src/main/webapp/imagesdata/";
+	    Path p = Paths.get(chemin, user.getPhoto());
+	    
+	    if (Files.exists(p)) {
+	        return Files.readAllBytes(p);
+	    } else {
+	        // Return a default or placeholder image
+	        return getDefaultImage();
+	    }
+	}
+	@Override
+	public byte[] getDefaultImage() throws IOException {
+	    // Read the default image file from the file system or resource
+	    String defaultImagePath = System.getProperty("user.dir") + "/src/main/webapp/imagesdata/default.jpg";
+	    Path defaultImageFilePath = Paths.get(defaultImagePath);
+	    if (Files.exists(defaultImageFilePath)) {
+	        return Files.readAllBytes(defaultImageFilePath);
+	    } else {
+	        // If the default image file doesn't exist, you can use a fallback approach
+	        // For example, load the default image from the classpath resources
+	        InputStream defaultImageStream = getClass().getClassLoader().getResourceAsStream("default.jpg");
+	        return IOUtils.toByteArray(defaultImageStream);
+	    }
 	}
 
 }

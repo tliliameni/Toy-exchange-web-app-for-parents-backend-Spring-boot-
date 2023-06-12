@@ -12,5 +12,5 @@ public interface ProfileService {
 	public User updateUser(long id,MultipartFile photo ,String username,String email, String phone)throws IOException;
 	String saveImage(MultipartFile mf)throws IOException ;
 	byte[]  getImage(long id)throws IOException;
-
+	byte[] getDefaultImage() throws IOException;
 }

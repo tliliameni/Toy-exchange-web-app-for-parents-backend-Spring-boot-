@@ -20,4 +20,6 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
 		    List<Article> searchByTitleAndCategoryName( @Param("categoryName") String categoryName);
 
 		 List<Article> findByUser(User user);
+		 List<Article> findByPriceAndExchange(String price, String exchange);
+		 List<Article> getArticlesByUserId(Long userId);
 	}

@@ -35,6 +35,9 @@ public class ProfileController {
 	ProfileServiceImp p;
 	@GetMapping(path="/getImage/{id}", produces = { MediaType.IMAGE_JPEG_VALUE, MediaType.ALL_VALUE, MediaType.IMAGE_PNG_VALUE })
 	public byte[] getImage(@PathVariable("id") int id) throws IOException {
+		if(p.getImage(id)==null) {
+			return p.getDefaultImage();
+		}
 	    return p.getImage(id);
 	}
 	@GetMapping(path="/phone/{id}")
