@@ -26,6 +26,7 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtils {
+// Logger instance for logging messages specific to JwtUtils class:
   private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
   @Value("${jwt.secret}")
@@ -55,10 +56,11 @@ public class JwtUtils {
 
   public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
     String jwt = generateTokenFromUsername(userPrincipal.getUsername());
+ // Construct a ResponseCookie object with the JWT token value, path, max age, and HTTP-only flag:
     ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
     return cookie;
   }
-
+//Generates a clean (empty) JWT cookie:
   public ResponseCookie getCleanJwtCookie() {
     ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
     return cookie;
@@ -87,12 +89,6 @@ public class JwtUtils {
 
     return false;
   }
-/*  @PostConstruct
-  public void init() {
-    // Generate a new secret key with a size of 512 bits for the HS512 algorithm
-    secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-  }*/
-  
   public String generateTokenFromUsername(String username) {
 	    Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 	    return Jwts.builder()

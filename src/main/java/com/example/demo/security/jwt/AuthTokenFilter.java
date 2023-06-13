@@ -19,6 +19,7 @@ import com.example.demo.service.UserDetailsServiceImpl;
 
 
 
+
 public class AuthTokenFilter extends OncePerRequestFilter {
   @Autowired
   private JwtUtils jwtUtils;
@@ -27,7 +28,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   private UserDetailsServiceImpl userDetailsService;
 
   private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
-
+  /**
+   * The doFilterInternal method performs the actual filtering logic for incoming requests.
+   * It validates the JWT token, extracts the username from the token, loads the user details,
+   * and sets the authentication in the SecurityContextHolder if the token is valid.
+   * It then proceeds to the next filter in the chain.
+   */
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 			jakarta.servlet.FilterChain filterChain) throws jakarta.servlet.ServletException, IOException {
@@ -52,7 +58,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
     filterChain.doFilter(request, response);
   }
-
+  /**
+   * The parseJwt method extracts the JWT token from the Authorization header of the HTTP request.
+   * It checks if the header starts with "Bearer " and returns the token without the "Bearer " prefix.
+   * If the header does not exist or does not start with "Bearer ", it returns null.
+   */
   private String parseJwt(HttpServletRequest request) {
 	    String headerAuth = request.getHeader("Authorization");
 

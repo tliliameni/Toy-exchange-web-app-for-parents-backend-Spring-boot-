@@ -232,8 +232,7 @@ public class ArticleController {
 	
 	@GetMapping("/recommendations")
 	public List<Article> getArticlesRecommendations(@RequestParam Long userId) {
-	  // Assuming you have a method to get the current user ID from the Angular storage service
-	    List<Article> articles = ArticleRepository.getArticlesByUserId(userId); // Retrieve articles created by the current user
+	    List<Article> articles = ArticleRepository.getArticlesByUserId(userId); 
 
 	    List<Article> recommendations = new ArrayList<>();
 
@@ -241,7 +240,7 @@ public class ArticleController {
 	        if (article.getExchange().equalsIgnoreCase("yes")) {
 	            List<Article> recommendedArticles = ArticleRepository.findByPriceAndExchange(
 	                    article.getPrice(), "yes");
-	            recommendedArticles.remove(article); // Exclude the user's own article from the recommendation
+	            recommendedArticles.remove(article); 
 	            recommendations.addAll(recommendedArticles);
 	        }
 	    }
@@ -250,27 +249,3 @@ public class ArticleController {
 	}
 
 }
-/*
- * @PutMapping("/update/{id}") public ResponseEntity<String>
- * updateArticle(@PathVariable("id") int id, @RequestBody Article
- * Article,@RequestParam("file") MultipartFile file ) {
- * System.out.println("Update Article with ID = " + id + "...");
- * Optional<Article> ArticleInfo = ArticleRepository.findById(id); try { // Save
- * the image file to the server's file system String fileName =
- * StringUtils.cleanPath(file.getOriginalFilename()); Path uploadPath =
- * Paths.get("uploads"); if (!Files.exists(uploadPath)) {
- * Files.createDirectories(uploadPath); } try (InputStream inputStream =
- * file.getInputStream()) { Path filePath = uploadPath.resolve(fileName);
- * Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
- * 
- * 
- * if (ArticleInfo.isPresent()) { Article article = ArticleInfo.get();
- * article.settitle(Article.gettitle());
- * article.setDescritption(Article.getDescription());
- * article.setExchange(Article.getExchange());
- * article.setPrice(Article.getPrice()); article.setPhoto(fileName);
- * ArticleRepository.save(Article); return new ResponseEntity<>(HttpStatus.OK);
- * } } catch (Exception e) { e.printStackTrace(); return
- * ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
- * body("Failed to create item."); } } }}
- */

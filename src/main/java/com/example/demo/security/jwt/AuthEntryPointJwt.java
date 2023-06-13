@@ -22,6 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
   private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
+  /**
+   * The commence method is called when an unauthorized request is received.
+   * It handles the unauthorized error by setting the response status code to SC_UNAUTHORIZED,
+   * setting the response content type to JSON, and writing the error response body to the output stream.
+   */
   @Override
   public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
       throws IOException, ServletException {
